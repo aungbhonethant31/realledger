@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ledgerly — Voucher & Payment Records</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#24362b;--moss:#486451;--bg:#f5f6f2;--line:#e2e7df;--muted:#718078;--danger:#b42318;--white:#fff;--gold:#b88931;--radius:14px;--shadow:0 8px 30px #24362b0a;--shadow-lg:0 25px 70px #24362b22;--ease:cubic-bezier(.4,0,.2,1)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--ink);font:14px "Inter","Noto Sans Myanmar","Myanmar Text",Arial,sans-serif;transition:opacity .2s var(--ease)}
+    button,input,select,textarea{font:inherit;color:inherit}
+    .hidden{display:none!important}
+    ::backdrop{background:#17211b99}
+
+    /* ── Login ─────────────────────────────────────────────────────── */
+    .login-screen{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 15% 15%,#dfe9df 0,transparent 30rem),radial-gradient(circle at 85% 85%,#e8e0cf 0,transparent 28rem),var(--bg)}
+    .login-card{width:min(100%,430px);padding:38px;background:rgba(255,255,255,.98);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-lg);animation:slide-up .4s var(--ease)}
+    @keyframes slide-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+    .login-brand{width:52px;height:52px;display:grid;place-items:center;border-radius:15px;background:var(--ink);color:#fff;font-size:22px;font-weight:700;animation:pop .3s var(--ease) .1s both}
+    @keyframes pop{from{transform:scale(.8)}to{transform:scale(1)}}
+    .login-card h1{margin:24px 0 8px;font-size:31px;letter-spacing:-.02em}
+    .login-card>p{color:var(--muted);line-height:1.6;margin:0 0 26px}
+    .login-card label{margin-top:15px}
+    .login-card .btn{width:100%;margin-top:22px}
+    .login-error{min-height:19px;margin-top:12px;color:var(--danger);font-weight:700;font-size:13px}
+    .login-toggle{text-align:center;margin-top:18px;color:var(--muted);font-size:13px}
+    .login-toggle a{color:var(--moss);font-weight:700;cursor:pointer;text-decoration:none}
+    .login-toggle a:hover{text-decoration:underline}
+
+    /* ── Sidebar ───────────────────────────────────────────────────── */
+    aside{position:fixed;inset:0 auto 0 0;width:245px;background:var(--ink);color:#fff;padding:25px 20px;display:flex;flex-direction:column;transition:transform .25s var(--ease)}
+    .brand{font-size:20px;font-weight:700;margin:3px 10px 30px;letter-spacing:-.01em}
+    .brand small{display:block;font-size:11px;color:rgba(255,255,255,.45);margin-top:5px;font-weight:400}
+    .account{padding:13px;margin-bottom:18px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.04)}
+    .account b{display:block;font-weight:600}
+    .account span{display:inline-block;margin-top:6px;padding:3px 8px;border-radius:12px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.72);font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+    nav button{width:100%;border:0;background:none;color:rgba(255,255,255,.6);text-align:left;padding:13px 14px;border-radius:12px;margin:3px 0;cursor:pointer;font-weight:500;transition:all .15s var(--ease)}
+    nav button.active,nav button:hover{background:#fff;color:var(--ink)}
+    aside footer{margin-top:auto}
+    .logout{width:100%;border:1px solid rgba(255,255,255,.17);background:transparent;color:#fff;padding:10px;border-radius:10px;cursor:pointer;transition:background .15s var(--ease)}
+    .logout:hover{background:rgba(255,255,255,.08)}
+
+    /* ── Main ──────────────────────────────────────────────────────── */
+    main{margin-left:245px;padding:36px;max-width:1500px;animation:fade-in .3s var(--ease)}
+    @keyframes fade-in{from{opacity:0}to{opacity:1}}
+    .top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}
+    .top h1{font-size:28px;letter-spacing:-.02em}
+    .top p{margin:7px 0 0;color:var(--muted)}
+
+    /* ── Buttons ───────────────────────────────────────────────────── */
+    .btn{border:0;border-radius:11px;padding:11px 15px;font-weight:600;cursor:pointer;transition:transform .1s var(--ease),opacity .15s var(--ease),background .15s var(--ease)}
+    .btn:active{transform:scale(.97)}
+    .primary{background:var(--ink);color:#fff}
+    .primary:hover{background:#1a2a20}
+    .soft{background:#edf0ea;color:var(--ink)}
+    .soft:hover{background:#e2e7df}
+    .link{background:none;color:var(--moss);padding:5px;font-weight:600}
+    .link:hover{text-decoration:underline}
+    .danger{background:none;color:var(--danger);padding:5px;font-weight:600}
+    .danger:hover{text-decoration:underline}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+
+    /* ── Cards & grid ──────────────────────────────────────────────── */
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}
+    .stat{padding:20px;transition:transform .2s var(--ease)}
+    .stat:hover{transform:translateY(-2px)}
+    .stat span{color:var(--muted);font-size:12px}
+    .stat strong{display:block;font-size:24px;margin-top:12px;font-weight:700}
+    .section{margin-top:23px}
+    .section-head{padding:18px 20px;border-bottom:1px solid var(--line);font-weight:700}
+
+    /* ── Toolbar & form fields ─────────────────────────────────────── */
+    .toolbar{padding:14px;display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+    .field{width:100%;border:1px solid #dfe4dc;border-radius:11px;background:#fff;padding:10px 12px;outline:none;transition:border-color .15s var(--ease),box-shadow .15s var(--ease)}
+    .field:focus{border-color:var(--moss);box-shadow:0 0 0 3px rgba(72,100,81,.1)}
+    .toolbar input{flex:1;min-width:160px}
+    .toolbar select,.toolbar input[type=month]{max-width:230px}
+
+    /* ── Table ─────────────────────────────────────────────────────── */
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse}
+    th{text-align:left;padding:12px 15px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--line);font-weight:700}
+    td{padding:14px 15px;border-bottom:1px solid #eef0ec;white-space:nowrap}
+    tr:last-child td{border:0}
+    tr:hover td{background:#fafbfa}
+    .products-cell{min-width:190px;white-space:normal}
+    .chip{display:inline-block;margin:2px 4px 2px 0;padding:5px 8px;border-radius:8px;background:#edf0ea;font-size:11px}
+    .empty{text-align:center;padding:55px 20px;color:var(--muted)}
+    .badge{border-radius:20px;padding:5px 9px;font-size:10px;font-weight:800;text-transform:capitalize}
+    .paid{background:#eaf8ee;color:#17733a}
+    .partial{background:#fff5db;color:#926400}
+    .unpaid{background:#eef0ee;color:#58645c}
+    .role-note{padding:12px 15px;margin-bottom:16px;border:1px solid #eadab8;border-radius:12px;background:#fff8e8;color:#76551b}
+
+    /* ── Modal ─────────────────────────────────────────────────────── */
+    dialog{border:0;border-radius:18px;padding:0;width:min(1050px,calc(100% - 30px));box-shadow:0 30px 80px #0004;animation:modal-in .25s var(--ease)}
+    @keyframes modal-in{from{opacity:0;transform:translateY(20px) scale(.98)}to{opacity:1;transform:none}}
+    dialog.fallback[open]{display:block;position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);z-index:1000;max-height:calc(100vh - 30px);overflow:auto}
+    .modal-head{padding:20px 23px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+    .modal-head h2{font-size:20px;letter-spacing:-.01em}
+    .modal-body{padding:22px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+    .full{grid-column:1/-1}
+    label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+    .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+    .item-row{display:grid;grid-template-columns:minmax(140px,1fr) repeat(4,minmax(105px,130px)) minmax(120px,145px) 34px;gap:8px;margin-bottom:8px;align-items:end}
+    .line-total{background:#f3f5f1;font-weight:700;min-height:40px;display:flex;align-items:center}
+    .voucher-total{margin-top:15px;padding:15px;border-radius:12px;background:#edf0ea;display:flex;justify-content:space-between;align-items:center}
+    .voucher-total strong{font-size:20px}
+    .close{border:0;background:none;font-size:22px;cursor:pointer;line-height:1;padding:0;width:34px;height:34px;display:grid;place-items:center;border-radius:8px}
+    .close:hover{background:#f3f5f1}
+    .detail-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+    .detail-summary div{padding:13px;border-radius:11px;background:#f3f5f1}
+    .detail-summary small{display:block;color:var(--muted);margin-bottom:5px}
+
+    /* ── Toast ─────────────────────────────────────────────────────── */
+    .toast{position:fixed;right:18px;bottom:18px;z-index:9999;padding:12px 16px;border-radius:10px;color:white;font-weight:600;box-shadow:0 8px 25px #0003;background:var(--moss);animation:toast-in .25s var(--ease)}
+    @keyframes toast-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+    /* ── Loading ───────────────────────────────────────────────────── */
+    .loading-screen{min-height:100vh;display:grid;place-items:center}
+    .spinner{width:36px;height:36px;border:3px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:900px){aside{position:static;width:auto;padding:15px}.brand{margin:0 0 10px}.account{margin:0 0 10px}aside nav{display:flex;overflow:auto}aside footer{margin-top:10px}.logout{width:auto}main{margin:0;padding:20px}.grid{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}}
+    @media(max-width:720px){.grid{grid-template-columns:1fr}.top{align-items:flex-start}.toolbar{flex-direction:column}.toolbar select,.toolbar input[type=month]{max-width:none}.item-row{grid-template-columns:1fr 1fr}.item-row>div:first-child,.line-wrap{grid-column:1/-1}.detail-summary{grid-template-columns:1fr}main{padding:15px}}
+  </style>
+  <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
+  <script type="module" crossorigin src="/assets/index-BzZ6nu92.js"></script>
+</head>
+<body>
+  <section id="loginScreen" class="login-screen hidden"></section>
+  <div id="loadingScreen" class="loading-screen"><div class="spinner"></div></div>
+  <div id="app" class="hidden">
+    <aside>
+      <div class="brand">Ledgerly<small>Voucher &amp; payment records</small></div>
+      <div class="account"><b id="accountName"></b><span id="accountRole"></span></div>
+      <nav id="nav"></nav>
+      <footer><button class="logout" id="logoutBtn">Sign out</button></footer>
+    </aside>
+    <main>
+      <div class="top">
+        <div><h1 id="title"></h1><p id="subtitle"></p></div>
+        <button class="btn primary" id="addBtn"></button>
+      </div>
+      <div id="view"></div>
+    </main>
+  </div>
+  <dialog id="modal">
+    <div class="modal-head"><h2 id="modalTitle"></h2><button type="button" class="close" id="closeModalBtn" aria-label="Close">&times;</button></div>
+    <form id="form" class="modal-body"></form>
+  </dialog>
+</body>
+</html>
