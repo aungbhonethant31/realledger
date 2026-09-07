@@ -72,8 +72,8 @@ function showLogin() {
 }
 
 const DEFAULT_ACCOUNTS = {
-  admin: { email: 'admin@ledgerly.app', password: 'admin123' },
-  user: { email: 'user@ledgerly.app', password: 'user123' },
+  admin: { email: 'admin@ledgerly.app', password: 'LedgerlyAdmin2026' },
+  user: { email: 'user@ledgerly.app', password: 'LedgerlyUser2026' },
 };
 
 function resolveEmail(usernameOrEmail) {
@@ -98,7 +98,7 @@ function renderLogin(mode) {
         <button class="btn primary" type="submit">${isSignup ? 'Create account' : 'Sign in'}</button>
         <div id="loginError" class="login-error" role="alert"></div>
       </form>
-      ${!isSignup ? `<div class="login-help" style="margin-top:22px;padding:14px;border-radius:12px;background:#eef1ea;color:#718078;font-size:12px;line-height:1.7">Demo accounts:<br><b>admin</b> / admin123 (administrator)<br><b>user</b> / user123 (normal user)</div>` : ''}
+      ${!isSignup ? `<div class="login-help" style="margin-top:22px;padding:14px;border-radius:12px;background:#eef1ea;color:#718078;font-size:12px;line-height:1.7">Demo accounts:<br><b>admin</b> / LedgerlyAdmin2026 (administrator)<br><b>user</b> / LedgerlyUser2026 (normal user)</div>` : ''}
       <div class="login-toggle">
         ${isSignup
           ? 'Already have an account? <a id="toggleMode">Sign in</a>'
