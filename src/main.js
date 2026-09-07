@@ -71,6 +71,17 @@ function showLogin() {
   renderLogin('signin');
 }
 
+const DEFAULT_ACCOUNTS = {
+  admin: { email: 'admin@ledgerly.app', password: 'admin123' },
+  user: { email: 'user@ledgerly.app', password: 'user123' },
+};
+
+function resolveEmail(usernameOrEmail) {
+  const key = usernameOrEmail.trim().toLowerCase();
+  if (DEFAULT_ACCOUNTS[key]) return DEFAULT_ACCOUNTS[key].email;
+  return usernameOrEmail.trim();
+}
+
 function renderLogin(mode) {
   const isSignup = mode === 'signup';
   $('#loginScreen').innerHTML = `
@@ -80,13 +91,14 @@ function renderLogin(mode) {
       <p>${isSignup ? 'Sign up to start managing customers, vouchers, and payment records.' : 'Sign in to manage customers, vouchers, and payment records.'}</p>
       <form id="loginForm">
         ${isSignup ? `<label for="signupName">Display name</label><input id="signupName" class="field" autocomplete="name" required>` : ''}
-        <label for="email">Email</label>
-        <input id="email" class="field" type="email" autocomplete="email" required>
+        <label for="email">${isSignup ? 'Email' : 'Username or email'}</label>
+        <input id="email" class="field" ${isSignup ? 'type="email"' : ''} autocomplete="${isSignup ? 'email' : 'username'}" required>
         <label for="password">Password</label>
         <input id="password" class="field" type="password" autocomplete="${isSignup ? 'new-password' : 'current-password'}" required>
         <button class="btn primary" type="submit">${isSignup ? 'Create account' : 'Sign in'}</button>
         <div id="loginError" class="login-error" role="alert"></div>
       </form>
+      ${!isSignup ? `<div class="login-help" style="margin-top:22px;padding:14px;border-radius:12px;background:#eef1ea;color:#718078;font-size:12px;line-height:1.7">Demo accounts:<br><b>admin</b> / admin123 (administrator)<br><b>user</b> / user123 (normal user)</div>` : ''}
       <div class="login-toggle">
         ${isSignup
           ? 'Already have an account? <a id="toggleMode">Sign in</a>'
@@ -126,7 +138,7 @@ async function handleLogin(e, isSignup) {
         renderLogin('signin');
       }
     } else {
-      const email = $('#email').value.trim();
+      const email = resolveEmail($('#email').value);
       const password = $('#password').value;
       await signIn(email, password);
       currentUser = await getSession();
